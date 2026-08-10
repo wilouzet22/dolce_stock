@@ -36,12 +36,12 @@ foreach ($topProducts as $row) {
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
         </div>
     </div>
-    <div class="stat-card" style="<?= (int) $stats['stock_bajo'] > 0 ? 'border-color: var(--danger-border); background: var(--danger-bg);' : '' ?>">
+    <div class="stat-card" style="<?= (int) $stats['stock_bajo'] > 0 ? 'border-color: var(--danger-border);' : '' ?>">
         <div class="stat-info">
             <div class="stat-value" style="<?= (int) $stats['stock_bajo'] > 0 ? 'color: var(--danger);' : '' ?>"><?= (int) $stats['stock_bajo'] ?></div>
             <div class="stat-label" style="<?= (int) $stats['stock_bajo'] > 0 ? 'color: var(--danger);' : '' ?>">Stock crítico (≤ 5)</div>
         </div>
-        <div class="stat-icon" style="<?= (int) $stats['stock_bajo'] > 0 ? 'background: var(--danger); color: #fff;' : '' ?>">
+        <div class="stat-icon" style="<?= (int) $stats['stock_bajo'] > 0 ? 'background: var(--danger-bg); color: var(--danger);' : '' ?>">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
         </div>
     </div>
@@ -104,27 +104,74 @@ foreach ($topProducts as $row) {
 
 <div class="two-col">
     <div class="card">
-        <div class="card-head"><h2 class="card-title">Últimas ventas</h2><a class="btn btn--ghost" href="<?= e(url('invoice', 'create')) ?>">Nueva factura</a></div>
+        <div class="card-head">
+            <h2 class="card-title">Últimas ventas</h2>
+            <a class="btn btn--ghost btn--sm" href="<?= e(url('invoice', 'create')) ?>">+ Nueva factura</a>
+        </div>
         <?php if ($ultimasFacturas === []) : ?>
             <p class="link-muted">Aún no hay facturas.</p>
         <?php else : ?>
-            <div class="table-wrap"><table class="data"><thead><tr><th>#</th><th>Fecha</th><th>Cliente</th><th class="num">Total</th></tr></thead><tbody>
-                <?php foreach ($ultimasFacturas as $f) : ?>
-                    <tr><td><a class="link-muted" href="<?= e(url('invoice', 'show', ['id' => (int) $f['id_factura']])) ?>"><?= (int) $f['id_factura'] ?></a></td><td><?= e($f['fecha']) ?></td><td><?= e($f['cliente'] ?? '—') ?></td><td class="num">$ <?= number_format((float) $f['total'], 2, '.', ',') ?></td></tr>
-                <?php endforeach; ?>
-            </tbody></table></div>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th class="num">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($ultimasFacturas as $f) : ?>
+                            <tr>
+                                <td>
+                                    <a class="btn btn--ghost btn--sm" href="<?= e(url('invoice', 'show', ['id' => (int) $f['id_factura']])) ?>">
+                                        #<?= (int) $f['id_factura'] ?>
+                                    </a>
+                                </td>
+                                <td><?= e($f['fecha']) ?></td>
+                                <td><?= e($f['cliente'] ?? '—') ?></td>
+                                <td class="num" style="font-weight:700; color:var(--accent);">$ <?= number_format((float) $f['total'], 2, '.', ',') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
+
     <div class="card">
-        <div class="card-head"><h2 class="card-title">Stock más bajo</h2><a class="link-muted" href="<?= e(url('inventory')) ?>">Movimientos</a></div>
+        <div class="card-head">
+            <h2 class="card-title">Stock más bajo</h2>
+            <a class="btn btn--ghost btn--sm" href="<?= e(url('inventory')) ?>">Movimientos →</a>
+        </div>
         <?php if ($stockAlerta === []) : ?>
             <p class="link-muted">No hay productos todavía.</p>
         <?php else : ?>
-            <div class="table-wrap"><table class="data"><thead><tr><th>Producto</th><th>Categoría</th><th class="num">Stock</th></tr></thead><tbody>
-                <?php foreach ($stockAlerta as $p) : ?>
-                    <tr><td><?= e($p['nombre']) ?></td><td><?= e($p['categoria']) ?></td><td class="num"><?= (int) $p['stock'] ?></td></tr>
-                <?php endforeach; ?>
-            </tbody></table></div>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th class="num">Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($stockAlerta as $p) : ?>
+                            <tr>
+                                <td style="font-weight:600;"><?= e($p['nombre']) ?></td>
+                                <td><span class="badge" style="background:var(--accent-soft);color:var(--accent);"><?= e($p['categoria']) ?></span></td>
+                                <td class="num">
+                                    <span class="badge <?= (int)$p['stock'] <= 5 ? 'badge--danger' : 'badge--warning' ?>">
+                                        <?= (int) $p['stock'] ?> uds
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
 </div>

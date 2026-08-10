@@ -253,4 +253,49 @@ final class AdminModel extends Model
             throw $e;
         }
     }
+
+    public function suppliers(): array
+    {
+        return $this->db->query('SELECT * FROM proveedores ORDER BY nombre')->fetchAll();
+    }
+
+    public function createSupplier(string $nombre, ?string $contacto, ?string $telefono, ?string $email, ?string $direccion): void
+    {
+        $this->db->prepare('INSERT INTO proveedores(nombre, contacto, telefono, email, direccion) VALUES(?,?,?,?,?)')
+            ->execute([$nombre, $contacto, $telefono, $email, $direccion]);
+    }
+
+    public function updateSupplier(int $id, string $nombre, ?string $contacto, ?string $telefono, ?string $email, ?string $direccion): void
+    {
+        $this->db->prepare('UPDATE proveedores SET nombre=?, contacto=?, telefono=?, email=?, direccion=? WHERE id_proveedor=?')
+            ->execute([$nombre, $contacto, $telefono, $email, $direccion, $id]);
+    }
+
+    public function deleteSupplier(int $id): void
+    {
+        $this->db->prepare('DELETE FROM proveedores WHERE id_proveedor=?')->execute([$id]);
+    }
+
+    public function rawMaterials(): array
+    {
+        return $this->db->query('SELECT m.*, p.nombre AS proveedor FROM materia_prima m LEFT JOIN proveedores p ON p.id_proveedor = m.id_proveedor ORDER BY m.nombre')->fetchAll();
+    }
+
+    public function createRawMaterial(string $nombre, string $unidad, float $stockActual, float $stockMinimo, ?float $precioUnitario, ?int $idProveedor): void
+    {
+        $this->db->prepare('INSERT INTO materia_prima(nombre, unidad_medida, stock_actual, stock_minimo, precio_unitario, id_proveedor) VALUES(?,?,?,?,?,?)')
+            ->execute([$nombre, $unidad, $stockActual, $stockMinimo, $precioUnitario, $idProveedor]);
+    }
+
+    public function updateRawMaterial(int $id, string $nombre, string $unidad, float $stockActual, float $stockMinimo, ?float $precioUnitario, ?int $idProveedor): void
+    {
+        $this->db->prepare('UPDATE materia_prima SET nombre=?, unidad_medida=?, stock_actual=?, stock_minimo=?, precio_unitario=?, id_proveedor=? WHERE id_materia_prima=?')
+            ->execute([$nombre, $unidad, $stockActual, $stockMinimo, $precioUnitario, $idProveedor, $id]);
+    }
+
+    public function deleteRawMaterial(int $id): void
+    {
+        $this->db->prepare('DELETE FROM materia_prima WHERE id_materia_prima=?')->execute([$id]);
+    }
 }
+
