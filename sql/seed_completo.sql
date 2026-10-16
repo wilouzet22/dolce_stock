@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 --  DOLCE STOCK — SEED COMPLETO DE DATOS DE PRUEBA
 -- ============================================================
 USE dolce_stock;
@@ -15,11 +15,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. EMPLEADOS (contraseña: Dolce2024!)
 INSERT INTO empleados (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, nombre, cargo, salario, email, password_hash, rol) VALUES
-('Valentina', 'Sofia',     'Mora',          'Herrera', 'Valentina Mora',     'Administradora', 2800000.00, 'valentina@dolcecafe.com',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('Carlos',    'Andres',    'Restrepo',      'Cano',    'Carlos Restrepo',    'Cajero',         1600000.00, 'carlos@dolcecafe.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'cajero'),
-('Mariana',   NULL,        'Perea',         'Zapata',  'Mariana Perea',      'Cajera',         1600000.00, 'mariana@dolcecafe.com',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'cajero'),
-('Felipe',    'Alejandro', 'Saldarriaga',   'Rios',    'Felipe Saldarriaga', 'Cajero',         1600000.00, 'felipe@dolcecafe.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'cajero'),
-('Laura',     'Isabela',   'Jimenez',       'Castro',  'Laura Jimenez',      'Administradora', 2800000.00, 'laura@dolcecafe.com',      '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+('Valentina', 'Sofia',     'Mora',          'Herrera', 'Valentina Mora',     'Administradora', 2800000.00, 'valentina@dolcecafe.com',  '$2y$10$dYRlyF.pP9UfTGrE.KorPeZxhuWxsy4iDoyvMvsrL/0QJO5SDCux6', 'admin'),
+('Carlos',    'Andres',    'Restrepo',      'Cano',    'Carlos Restrepo',    'Cajero',         1600000.00, 'carlos@dolcecafe.com',     '$2y$10$dYRlyF.pP9UfTGrE.KorPeZxhuWxsy4iDoyvMvsrL/0QJO5SDCux6', 'cajero'),
+('Mariana',   NULL,        'Perea',         'Zapata',  'Mariana Perea',      'Cajera',         1600000.00, 'mariana@dolcecafe.com',    '$2y$10$dYRlyF.pP9UfTGrE.KorPeZxhuWxsy4iDoyvMvsrL/0QJO5SDCux6', 'cajero'),
+('Felipe',    'Alejandro', 'Saldarriaga',   'Rios',    'Felipe Saldarriaga', 'Cajero',         1600000.00, 'felipe@dolcecafe.com',     '$2y$10$dYRlyF.pP9UfTGrE.KorPeZxhuWxsy4iDoyvMvsrL/0QJO5SDCux6', 'cajero'),
+('Laura',     'Isabela',   'Jimenez',       'Castro',  'Laura Jimenez',      'Administradora', 2800000.00, 'laura@dolcecafe.com',      '$2y$10$dYRlyF.pP9UfTGrE.KorPeZxhuWxsy4iDoyvMvsrL/0QJO5SDCux6', 'admin');
 
 -- 2. CATEGORIAS
 INSERT INTO categorias (nombre) VALUES
