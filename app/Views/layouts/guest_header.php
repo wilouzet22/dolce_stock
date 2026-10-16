@@ -6,7 +6,7 @@ $pageTitle = $pageTitle ?? 'Acceso';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= e($pageTitle) ?> — Dolce Café</title>
+    <title><?= e($pageTitle) ?> — Dolce Stock</title>
     <script>
         (function() {
             var savedTheme = localStorage.getItem('dolce_theme');
@@ -20,7 +20,7 @@ $pageTitle = $pageTitle ?? 'Acceso';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/admin.css?v=4">
+    <link rel="stylesheet" href="assets/css/admin.css?v=32">
 </head>
 <body class="admin admin--guest">
 <div class="auth-shell">
@@ -32,17 +32,74 @@ $pageTitle = $pageTitle ?? 'Acceso';
             <span id="themeLabel">Modo Oscuro</span>
         </button>
     </div>
-    <div class="auth-brand">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent); margin: 0 auto 0.5rem; display: block;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
-        <span class="auth-brand-text">Dolce Café</span>
-    </div>
-    <div class="auth-card card">
-        <h1 class="auth-title"><?= e($pageTitle) ?></h1>
-        <?php foreach (['ok', 'err'] as $k) : $m = flash($k); ?>
-            <?php if ($m) : ?>
-                <div class="flash flash--<?= e($k) ?>"><?= e($m) ?></div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-        <?php if (isset($authReady) && !$authReady) : ?>
-            <div class="flash flash--err">Ejecutá en phpMyAdmin el archivo <code>sql/empleados_auth.sql</code> sobre la base <code>dolce_stock</code> para habilitar el registro e inicio de sesión.</div>
-        <?php endif; ?>
+
+    <!-- Contenedor Centrado de la Mancha de Café y Login -->
+    <div class="coffee-splash-wrapper">
+        <div class="coffee-stain-bg">
+            <svg class="stain-shape-svg" viewBox="0 0 620 620" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="stainGrad" cx="50%" cy="48%" r="52%">
+                        <stop offset="0%" stop-color="var(--stain-color-accent)"/>
+                        <stop offset="45%" stop-color="#2F1407"/>
+                        <stop offset="85%" stop-color="var(--stain-color-main)"/>
+                        <stop offset="100%" stop-color="#140601"/>
+                    </radialGradient>
+                    <radialGradient id="stainInnerRing" cx="50%" cy="50%" r="48%">
+                        <stop offset="82%" stop-color="rgba(226, 141, 56, 0)"/>
+                        <stop offset="94%" stop-color="rgba(226, 141, 56, 0.22)"/>
+                        <stop offset="100%" stop-color="rgba(226, 141, 56, 0)"/>
+                    </radialGradient>
+                </defs>
+
+                <!-- Mancha de café elegante, fluida y armónica (SIN círculos aislados) -->
+                <path class="stain-path-outer" fill="url(#stainGrad)"
+                    d="
+                    M 310 40
+                    C 375 36,  425 58,  475 88
+                    C 525 118, 568 152, 588 205
+                    C 608 258, 595 315, 602 370
+                    C 609 425, 590 478, 555 520
+                    C 520 562, 468 586, 412 602
+                    C 356 618, 295 615, 242 596
+                    C 189 577, 145 540, 112 494
+                    C 79 448,  62 390,  66 332
+                    C 70 274,  95 218,  134 170
+                    C 173 122, 235 44,  310 40 Z
+                    " />
+
+                <!-- Anillo de secado sutil para realismo de café gourmet -->
+                <path fill="url(#stainInnerRing)"
+                    d="
+                    M 310 40
+                    C 375 36,  425 58,  475 88
+                    C 525 118, 568 152, 588 205
+                    C 608 258, 595 315, 602 370
+                    C 609 425, 590 478, 555 520
+                    C 520 562, 468 586, 412 602
+                    C 356 618, 295 615, 242 596
+                    C 189 577, 145 540, 112 494
+                    C 79 448,  62 390,  66 332
+                    C 70 274,  95 218,  134 170
+                    C 173 122, 235 44,  310 40 Z
+                    " />
+            </svg>
+        </div><!-- /.coffee-stain-bg -->
+
+            <!-- Card de login alojada dentro de la mancha -->
+            <div class="auth-card coffee-stain-content">
+                <div class="auth-brand">
+                    <div class="auth-brand-logo-wrapper">
+                        <img src="assets/img/logo.png" alt="Dolce Stock Logo" class="auth-brand-logo-img">
+                    </div>
+                    <span class="auth-brand-text">Dolce Stock</span>
+                </div>
+                <h1 class="auth-title"><?= e($pageTitle) ?></h1>
+                <?php foreach (['ok', 'err'] as $k) : $m = flash($k); ?>
+                    <?php if ($m) : ?>
+                        <div class="flash flash--<?= e($k) ?>"><?= e($m) ?></div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                <?php if (isset($authReady) && !$authReady) : ?>
+                    <div class="flash flash--err">Ejecutá en phpMyAdmin el archivo <code>sql/empleados_auth.sql</code> sobre la base <code>dolce_stock</code> para habilitar el registro e inicio de sesión.</div>
+                <?php endif; ?>
+

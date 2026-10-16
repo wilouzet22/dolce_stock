@@ -27,7 +27,7 @@ final class Router
 
         // RBAC: Restricción de acceso para Cajeros
         $rol = $_SESSION['empleado_rol'] ?? 'cajero';
-        $cajeroPermitted = ['invoice', 'client', 'auth'];
+        $cajeroPermitted = ['invoice', 'client', 'auth', 'inventory'];
         if ($empleadoId > 0 && $rol === 'cajero' && !in_array($slug, $cajeroPermitted, true)) {
             flash('err', 'Acceso denegado: No tienes permisos para ver esta sección.');
             header('Location: ' . url('invoice'));

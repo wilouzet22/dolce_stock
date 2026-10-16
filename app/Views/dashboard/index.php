@@ -19,10 +19,10 @@ foreach ($topProducts as $row) {
 <div class="welcome-banner">
     <div class="welcome-content">
         <h2>Hola, <?= e((string) ($_SESSION['empleado_nombre'] ?? 'Equipo')) ?></h2>
-        <p>Aquí tienes el resumen de la actividad de tu Dolce Café el día de hoy.</p>
+        <p>Aquí tienes el resumen de la actividad de La Arábica el día de hoy.</p>
     </div>
     <div class="welcome-img">
-        <img src="assets/img/cafe_illustration.png" alt="Dolce Café Illustration">
+        <img src="assets/img/cafe_illustration.png" alt="La Arábica Illustration">
     </div>
 </div>
 

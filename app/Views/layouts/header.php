@@ -11,7 +11,7 @@ $userInitial = mb_strtoupper(mb_substr($userName, 0, 1));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= e($pageTitle) ?> — Dolce Café</title>
+    <title><?= e($pageTitle) ?> — Dolce Stock</title>
     <script>
         (function() {
             var savedTheme = localStorage.getItem('dolce_theme');
@@ -25,7 +25,7 @@ $userInitial = mb_strtoupper(mb_substr($userName, 0, 1));
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/admin.css?v=4">
+    <link rel="stylesheet" href="assets/css/admin.css?v=25">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body class="admin">
@@ -34,13 +34,12 @@ $userInitial = mb_strtoupper(mb_substr($userName, 0, 1));
         <a href="<?= e(url('dashboard')) ?>" class="brand">
             <div class="brand-header-flex">
                 <div class="brand-icon-wrapper">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                    <img src="assets/img/logo.png" alt="Dolce Stock Logo" class="brand-logo-img">
                 </div>
                 <div>
-                    <span class="brand-text">Dolce Café</span>
+                    <span class="brand-text">Dolce Stock</span>
                 </div>
             </div>
-            <span class="brand-sub">SISTEMA GESTIÓN</span>
         </a>
         <nav class="nav">
             <span class="nav-label">Menú Principal</span>
@@ -49,19 +48,12 @@ $userInitial = mb_strtoupper(mb_substr($userName, 0, 1));
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                 Resumen
             </a>
-            <a class="nav-item<?= $currentController === 'category' ? ' is-active' : '' ?>" href="<?= e(url('category')) ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                Categorías
-            </a>
-            <a class="nav-item<?= $currentController === 'product' ? ' is-active' : '' ?>" href="<?= e(url('product')) ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                Productos
-            </a>
+            <?php endif; ?>
             <a class="nav-item<?= $currentController === 'inventory' ? ' is-active' : '' ?>" href="<?= e(url('inventory')) ?>">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                 Inventario
             </a>
-            <?php endif; ?>
+
             <a class="nav-item<?= $currentController === 'client' ? ' is-active' : '' ?>" href="<?= e(url('client')) ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 Clientes

@@ -1,6 +1,6 @@
         </main>
         <footer class="site-footer">
-            Dolce Café &copy; <?= date('Y') ?> · Sistema de Inventario y Ventas
+            Dolce Stock &copy; <?= date('Y') ?> · Sistema de Inventario y Ventas
         </footer>
     </div>
 </div>
@@ -38,5 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<script src="assets/js/table-search.js"></script>
 </body>
 </html>

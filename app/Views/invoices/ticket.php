@@ -7,7 +7,7 @@ declare(strict_types=1);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ticket #<?= (int) $factura['id_factura'] ?> - Dolce Café</title>
+    <title>Ticket #<?= (int) $factura['id_factura'] ?> - La Arábica</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -147,44 +147,50 @@ declare(strict_types=1);
 
 <div class="ticket">
     <div class="brand-header">
-        <h1>DOLCE CAFÉ</h1>
-        <p>El mejor café de autor</p>
-        <p>NIT: 900.123.456-7</p>
+        <h1>CAFÉ LA ARÁBICA</h1>
+        <p>Café de Especialidad & Repostería</p>
+        <p>NIT: 901.482.315-4 · Régimen Simplificado</p>
+        <p>Medellín, Colombia · Tel: +57 (300) 845-9210</p>
     </div>
 
     <div class="meta">
-        <div><strong>TICKET:</strong> #<?= str_pad((string)$factura['id_factura'], 6, '0', STR_PAD_LEFT) ?></div>
+        <div><strong>FACTURA:</strong> FAC-<?= str_pad((string)$factura['id_factura'], 6, '0', STR_PAD_LEFT) ?></div>
         <div><strong>FECHA:</strong> <?= e($factura['fecha']) ?></div>
-        <div><strong>CAJERO:</strong> <?= e($factura['empleado'] ?? 'Genérico') ?></div>
-        <div><strong>CLIENTE:</strong> <?= e($factura['cliente'] ?? 'Consumidor Final') ?></div>
+        <div><strong>CAJERO:</strong> <?= e($factura['empleado'] ?? 'Caja') ?></div>
+        <div><strong>CLIENTE:</strong> <?= e($factura['cliente'] ?? 'Consumidor Final') ?><?= !empty($factura['cliente_apellidos']) ? ' ' . e($factura['cliente_apellidos']) : '' ?></div>
+        <div><strong>NIT/CC:</strong> <?= !empty($factura['cliente_identificacion']) ? e($factura['cliente_identificacion']) : '222222222222' ?></div>
+        <?php if (!empty($factura['cliente_email'])) : ?><div><strong>EMAIL:</strong> <?= e($factura['cliente_email']) ?></div><?php endif; ?>
+        <?php if (!empty($factura['cliente_direccion'])) : ?><div><strong>DIR:</strong> <?= e($factura['cliente_direccion']) ?></div><?php endif; ?>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th class="qty">CANT</th>
-                <th class="desc">DESCRIPCIÓN</th>
-                <th class="num sub">IMPORTE</th>
+                <th style="width:12%; text-align:center;">CANT</th>
+                <th style="width:48%;">PRODUCTO</th>
+                <th style="width:20%; text-align:right;">P.UNIT</th>
+                <th style="width:20%; text-align:right;">TOTAL</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($detalles as $d): ?>
             <tr>
-                <td class="qty"><?= (int) $d['cantidad'] ?></td>
-                <td class="desc"><?= e($d['producto']) ?></td>
-                <td class="num sub">$<?= number_format((float) $d['subtotal'], 2, '.', ',') ?></td>
+                <td style="text-align:center;"><?= (int) $d['cantidad'] ?></td>
+                <td><?= e($d['producto']) ?></td>
+                <td style="text-align:right;">$<?= number_format((float) $d['precio_unitario'], 2, '.', ',') ?></td>
+                <td style="text-align:right; font-weight:bold;">$<?= number_format((float) $d['subtotal'], 2, '.', ',') ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 
     <div class="totals">
-        TOTAL: <strong>$ <?= number_format((float) $factura['total'], 2, '.', ',') ?></strong>
+        TOTAL PAGADO: <strong>$ <?= number_format((float) $factura['total'], 2, '.', ',') ?></strong>
     </div>
 
     <div class="footer">
         <p>¡Gracias por tu compra!</p>
-        <p>Síguenos en @dolcecafe_oficial</p>
+        <p>Síguenos en @laarabica_oficial</p>
     </div>
     
     <button class="btn-print" onclick="window.print()">🖨️ IMPRIMIR TICKET</button>

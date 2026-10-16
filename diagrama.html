@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Flujo de Información - DOLCE STOCK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            max-width: 900px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            background: #334155;
+            color: white;
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #475569;
+        }
+
+        .btn.active {
+            background: var(--primary);
+            color: #0f172a;
+            border-color: #7dd3fc;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .img-view img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 20px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>📊 Diagrama de Flujo de Información - DOLCE STOCK</h1>
+        <p>Única base de datos central <code>dolce_stock</code> con correspondencia de tablas por cada módulo</p>
+    </div>
+
+    <div class="tab-buttons">
+        <button class="btn active" onclick="switchTab('image-tab')">🖼️ Vista Imagen HD (Única BD)</button>
+        <button class="btn" onclick="switchTab('vector-tab')">📐 Vista Diagrama Vectorial (SVG)</button>
+    </div>
+
+    <div class="container">
+        <!-- Tab 1: Imagen generada HD -->
+        <div id="image-tab" class="tab-content active img-view">
+            <img src="assets/img/diagrama_flujo.jpg" alt="Diagrama de Flujo DOLCE STOCK Única BD">
+            <br>
+            <a href="assets/img/diagrama_flujo.jpg" download="Diagrama_Flujo_Dolce_Stock.jpg" class="download-btn">
+                ⬇️ Descargar Imagen en Alta Resolución (JPG)
+            </a>
+        </div>
+
+        <!-- Tab 2: Diagrama Vectorial Renderizado -->
+        <div id="vector-tab" class="tab-content">
+            <div class="mermaid">
+                flowchart TD
+                INICIO(["INICIO (Sesión)"]) --> PROG_LOGIN[/ "1. INICIO DE SESIÓN (Ingresar credenciales)" /]
+                PROG_LOGIN --> DEC_REGISTRO{ "¿El usuario tiene cuenta?" }
+
+                DEC_REGISTRO -- No --> REGISTRO[/ "REGISTRO DE USUARIO" /]
+                REGISTRO --> AUTENTICACION[ "2. AUTENTICACIÓN" ]
+                DEC_REGISTRO -- Sí --> AUTENTICACION
+
+                AUTENTICACION --> DEC_VAL{"¿Credenciales válidas?"}
+                DEC_VAL -- No (Error) --> PROG_LOGIN
+                DEC_VAL -- Sí (Correctas) --> DASHBOARD[ "3. DASHBOARD / MENÚ PRINCIPAL" ]
+
+                DASHBOARD --> MOD_CAT[ "1. MÓDULO CATEGORÍAS<br>(Tabla: categorias)" ]
+                DASHBOARD --> MOD_PROD[ "2. MÓDULO PRODUCTOS<br>(Tabla: productos)" ]
+                DASHBOARD --> MOD_CLI[ "3. MÓDULO CLIENTES<br>(Tabla: clientes)" ]
+                DASHBOARD --> MOD_EMP[ "4. MÓDULO EMPLEADOS<br>(Tabla: empleados)" ]
+                DASHBOARD --> MOD_FACT[ "5. MÓDULO FACTURACIÓN<br>(Tablas: facturas y detalle_factura)" ]
+                DASHBOARD --> MOD_INV[ "6. MÓDULO MOVIMIENTOS INVENTARIO<br>(Tabla: movimientos_inventario)" ]
+
+                MOD_CAT -.-> BD[( "ÚNICA BASE DE DATOS<br>dolce_stock" )]
+                MOD_PROD -.-> BD
+                MOD_CLI -.-> BD
+                MOD_EMP -.-> BD
+                MOD_FACT -.-> BD
+                MOD_INV -.-> BD
+
+                BD --> CERRAR_SESION[ "4. CERRAR SESIÓN" ]
+                CERRAR_SESION --> FIN(["FIN (Sesión cerrada)"])
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

@@ -79,6 +79,7 @@ final class AdminModel extends Model
         $this->db->prepare('INSERT INTO categorias(nombre) VALUES(?)')->execute([$nombre]);
     }
 
+
     public function updateCategory(int $id, string $nombre): void
     {
         $this->db->prepare('UPDATE categorias SET nombre=? WHERE id_categoria=?')->execute([$nombre, $id]);
@@ -89,14 +90,18 @@ final class AdminModel extends Model
         $this->db->prepare('DELETE FROM categorias WHERE id_categoria=?')->execute([$id]);
     }
 
-    public function createClient(string $nombre): void
+    public function createClient(string $nombre, ?string $apellidos = null, ?string $identificacion = null, ?string $email = null, ?string $direccion = null): void
     {
-        $this->db->prepare('INSERT INTO clientes(nombre) VALUES(?)')->execute([$nombre]);
+        $this->ensureClientColumns();
+        $this->db->prepare('INSERT INTO clientes(nombre, apellidos, identificacion, email, direccion) VALUES(?,?,?,?,?)')
+            ->execute([$nombre, $apellidos ?: null, $identificacion ?: null, $email ?: null, $direccion ?: null]);
     }
 
-    public function updateClient(int $id, string $nombre): void
+    public function updateClient(int $id, string $nombre, ?string $apellidos = null, ?string $identificacion = null, ?string $email = null, ?string $direccion = null): void
     {
-        $this->db->prepare('UPDATE clientes SET nombre=? WHERE id_cliente=?')->execute([$nombre, $id]);
+        $this->ensureClientColumns();
+        $this->db->prepare('UPDATE clientes SET nombre=?, apellidos=?, identificacion=?, email=?, direccion=? WHERE id_cliente=?')
+            ->execute([$nombre, $apellidos ?: null, $identificacion ?: null, $email ?: null, $direccion ?: null, $id]);
     }
 
     public function deleteClient(int $id): void
@@ -104,19 +109,108 @@ final class AdminModel extends Model
         $this->db->prepare('DELETE FROM clientes WHERE id_cliente=?')->execute([$id]);
     }
 
-    public function createEmployee(string $nombre, ?string $cargo, ?float $salario): void
+    public function ensureClientColumns(): void
     {
-        $this->db->prepare('INSERT INTO empleados(nombre,cargo,salario) VALUES(?,?,?)')->execute([$nombre, $cargo, $salario]);
+        try {
+            $dbName = Database::dbname();
+            $st = $this->db->prepare(
+                'SELECT COLUMN_NAME FROM information_schema.columns WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?'
+            );
+            
+            $st->execute([$dbName, 'clientes', 'identificacion']);
+            if (!$st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `clientes` ADD COLUMN `identificacion` varchar(50) DEFAULT NULL AFTER `id_cliente`");
+            }
+            
+            $st->execute([$dbName, 'clientes', 'Aoellidos']);
+            if ($st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `clientes` CHANGE COLUMN `Aoellidos` `apellidos` varchar(150) DEFAULT NULL");
+            } else {
+                $st->execute([$dbName, 'clientes', 'apellidos']);
+                if (!$st->fetchColumn()) {
+                    $this->db->exec("ALTER TABLE `clientes` ADD COLUMN `apellidos` varchar(150) DEFAULT NULL AFTER `nombre`");
+                }
+            }
+
+            $st->execute([$dbName, 'clientes', 'email']);
+            if (!$st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `clientes` ADD COLUMN `email` varchar(150) DEFAULT NULL AFTER `apellidos`");
+            }
+            
+            $st->execute([$dbName, 'clientes', 'direccion']);
+            if (!$st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `clientes` ADD COLUMN `direccion` varchar(255) DEFAULT NULL AFTER `email`");
+            }
+        } catch (Throwable) {
+            // Ignorar errores si ya existen las columnas
+        }
     }
 
-    public function updateEmployee(int $id, string $nombre, ?string $cargo, ?float $salario): void
+    public function ensureAuthColumns(): void
     {
-        $this->db->prepare('UPDATE empleados SET nombre=?,cargo=?,salario=? WHERE id_empleado=?')->execute([$nombre, $cargo, $salario, $id]);
+        try {
+            $dbName = Database::dbname();
+            $st = $this->db->prepare(
+                'SELECT COLUMN_NAME FROM information_schema.columns WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?'
+            );
+            
+            $st->execute([$dbName, 'empleados', 'email']);
+            if (!$st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `empleados` ADD COLUMN `email` varchar(150) DEFAULT NULL AFTER `salario`, ADD COLUMN `password_hash` varchar(255) DEFAULT NULL AFTER `email`, ADD UNIQUE KEY `uq_empleados_email` (`email`)");
+            }
+            
+            $st->execute([$dbName, 'empleados', 'rol']);
+            if (!$st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `empleados` ADD COLUMN `rol` ENUM('admin', 'cajero') NOT NULL DEFAULT 'cajero' AFTER `password_hash`");
+                $this->db->exec("UPDATE `empleados` SET `rol` = 'admin'");
+            }
+            $this->db->exec("UPDATE `empleados` SET `rol` = 'admin' WHERE (rol IS NULL OR rol = '' OR rol = 'cajero') AND (LOWER(cargo) LIKE '%admin%' OR LOWER(cargo) LIKE '%jefe%')");
+            $this->db->exec("UPDATE `empleados` SET `rol` = 'cajero' WHERE rol IS NULL OR rol = ''");
+        } catch (Throwable) {
+            // Ignorar si la columna ya existe o falla por permisos
+        }
+    }
+
+    public function isEmailTaken(string $email, int $excludeId = 0): bool
+    {
+        $email = mb_strtolower(trim($email));
+        if ($email === '') {
+            return false;
+        }
+        $st = $this->db->prepare('SELECT COUNT(*) FROM empleados WHERE LOWER(email) = ? AND id_empleado != ?');
+        $st->execute([$email, $excludeId]);
+        return ((int) $st->fetchColumn()) > 0;
+    }
+
+    public function createEmployee(string $nombre, ?string $cargo, ?float $salario, ?string $email = null, ?string $password = null, string $rol = 'cajero'): void
+    {
+        $this->ensureAuthColumns();
+        $emailNorm = ($email !== null && trim($email) !== '') ? mb_strtolower(trim($email)) : null;
+        $hash = ($password !== null && trim($password) !== '') ? password_hash($password, PASSWORD_DEFAULT) : null;
+
+        $this->db->prepare('INSERT INTO empleados(nombre, cargo, salario, email, password_hash, rol) VALUES(?,?,?,?,?,?)')
+            ->execute([$nombre, $cargo, $salario, $emailNorm, $hash, $rol]);
+    }
+
+    public function updateEmployee(int $id, string $nombre, ?string $cargo, ?float $salario, ?string $email = null, ?string $password = null, string $rol = 'cajero'): void
+    {
+        $this->ensureAuthColumns();
+        $emailNorm = ($email !== null && trim($email) !== '') ? mb_strtolower(trim($email)) : null;
+
+        if ($password !== null && trim($password) !== '') {
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $this->db->prepare('UPDATE empleados SET nombre=?, cargo=?, salario=?, email=?, password_hash=?, rol=? WHERE id_empleado=?')
+                ->execute([$nombre, $cargo, $salario, $emailNorm, $hash, $rol, $id]);
+        } else {
+            $this->db->prepare('UPDATE empleados SET nombre=?, cargo=?, salario=?, email=?, rol=? WHERE id_empleado=?')
+                ->execute([$nombre, $cargo, $salario, $emailNorm, $rol, $id]);
+        }
     }
 
     public function deleteEmployee(int $id): void
     {
-        $this->db->prepare('DELETE FROM empleados WHERE id_empleado=?')->execute([$id]);
+        $this->db->prepare('UPDATE facturas SET id_empleado = NULL WHERE id_empleado = ?')->execute([$id]);
+        $this->db->prepare('DELETE FROM empleados WHERE id_empleado = ?')->execute([$id]);
     }
 
     public function categories(): array
@@ -134,9 +228,93 @@ final class AdminModel extends Model
         return $this->db->query('SELECT id_producto,nombre,precio,stock FROM productos ORDER BY nombre')->fetchAll();
     }
 
+    public function findProductByName(string $nombre): ?array
+    {
+        $st = $this->db->prepare('SELECT * FROM productos WHERE LOWER(TRIM(nombre)) = LOWER(TRIM(?)) LIMIT 1');
+        $st->execute([$nombre]);
+        $row = $st->fetch();
+        return $row ?: null;
+    }
+
+    public function countProducts(string $search = ''): int
+    {
+        if ($search !== '') {
+            $st = $this->db->prepare('SELECT COUNT(*) FROM productos p JOIN categorias c ON c.id_categoria=p.id_categorias WHERE p.nombre LIKE ? OR c.nombre LIKE ?');
+            $like = '%' . $search . '%';
+            $st->execute([$like, $like]);
+        } else {
+            $st = $this->db->query('SELECT COUNT(*) FROM productos');
+        }
+        return (int) $st->fetchColumn();
+    }
+
+    public function productsPaged(string $search = '', int $page = 1, int $perPage = 10): array
+    {
+        $offset = ($page - 1) * $perPage;
+        if ($search !== '') {
+            $like = '%' . $search . '%';
+            $st = $this->db->prepare(
+                'SELECT p.*, c.nombre AS categoria FROM productos p
+                 JOIN categorias c ON c.id_categoria = p.id_categorias
+                 WHERE p.nombre LIKE :like1 OR c.nombre LIKE :like2
+                 ORDER BY c.nombre, p.nombre
+                 LIMIT :lim OFFSET :off'
+            );
+            $st->bindValue(':like1', $like);
+            $st->bindValue(':like2', $like);
+            $st->bindValue(':lim',  $perPage, \PDO::PARAM_INT);
+            $st->bindValue(':off',  $offset,  \PDO::PARAM_INT);
+        } else {
+            $st = $this->db->prepare(
+                'SELECT p.*, c.nombre AS categoria FROM productos p
+                 JOIN categorias c ON c.id_categoria = p.id_categorias
+                 ORDER BY c.nombre, p.nombre
+                 LIMIT :lim OFFSET :off'
+            );
+            $st->bindValue(':lim', $perPage, \PDO::PARAM_INT);
+            $st->bindValue(':off', $offset,  \PDO::PARAM_INT);
+        }
+        $st->execute();
+        return $st->fetchAll();
+    }
+
+    public function allProducts(string $search = ''): array
+    {
+        if ($search !== '') {
+            $like = '%' . $search . '%';
+            $st = $this->db->prepare(
+                'SELECT p.*, c.nombre AS categoria FROM productos p
+                 JOIN categorias c ON c.id_categoria = p.id_categorias
+                 WHERE p.nombre LIKE ? OR c.nombre LIKE ?
+                 ORDER BY c.nombre, p.nombre'
+            );
+            $st->execute([$like, $like]);
+            return $st->fetchAll();
+        }
+        $st = $this->db->query(
+            'SELECT p.*, c.nombre AS categoria FROM productos p
+             JOIN categorias c ON c.id_categoria = p.id_categorias
+             ORDER BY c.nombre, p.nombre'
+        );
+        return $st->fetchAll();
+    }
+
+
     public function createProduct(string $nombre, float $precio, int $stock, int $cat): void
     {
         $this->db->prepare('INSERT INTO productos(nombre,precio,stock,id_categorias) VALUES(?,?,?,?)')->execute([$nombre, $precio, $stock, $cat]);
+    }
+
+    public function getOrCreateProductByName(string $nombre, int $defaultCat): int
+    {
+        $st = $this->db->prepare('SELECT id_producto FROM productos WHERE LOWER(nombre) = LOWER(?)');
+        $st->execute([$nombre]);
+        $row = $st->fetch();
+        if ($row) {
+            return (int) $row['id_producto'];
+        }
+        $this->createProduct($nombre, 0.0, 0, $defaultCat);
+        return (int) $this->db->lastInsertId();
     }
 
     public function updateProduct(int $id, string $nombre, float $precio, int $stock, int $cat): void
@@ -180,16 +358,102 @@ final class AdminModel extends Model
         }
     }
 
+    public function deleteMove(int $idMovimiento): void
+    {
+        try {
+            $this->db->beginTransaction();
+            // Get the movement data before deleting
+            $st = $this->db->prepare('SELECT * FROM movimientos_inventario WHERE id_movimiento = ? FOR UPDATE');
+            $st->execute([$idMovimiento]);
+            $move = $st->fetch();
+            if (!$move) {
+                throw new RuntimeException('Movimiento no encontrado.');
+            }
+            // Reverse the stock change
+            $delta = $move['tipo'] === 'ENTRADA' ? -(int)$move['cantidad'] : (int)$move['cantidad'];
+            $this->db->prepare('UPDATE productos SET stock = stock + ? WHERE id_producto = ?')
+                ->execute([$delta, (int)$move['id_producto']]);
+            // Delete the movement record
+            $this->db->prepare('DELETE FROM movimientos_inventario WHERE id_movimiento = ?')
+                ->execute([$idMovimiento]);
+            $this->db->commit();
+        } catch (Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+
     public function invoiceList(): array
     {
         return $this->db->query('SELECT f.id_factura,f.fecha,f.total,c.nombre AS cliente,e.nombre AS empleado FROM facturas f LEFT JOIN clientes c ON c.id_cliente=f.id_cliente LEFT JOIN empleados e ON e.id_empleado=f.id_empleado ORDER BY f.fecha DESC,f.id_factura DESC')->fetchAll();
     }
 
+
     public function invoiceById(int $id): ?array
     {
-        $st = $this->db->prepare('SELECT f.*,c.nombre AS cliente,e.nombre AS empleado FROM facturas f LEFT JOIN clientes c ON c.id_cliente=f.id_cliente LEFT JOIN empleados e ON e.id_empleado=f.id_empleado WHERE f.id_factura=?');
+        $st = $this->db->prepare('SELECT f.*, c.nombre AS cliente, c.apellidos AS cliente_apellidos, c.identificacion AS cliente_identificacion, c.email AS cliente_email, c.direccion AS cliente_direccion, e.nombre AS empleado FROM facturas f LEFT JOIN clientes c ON c.id_cliente=f.id_cliente LEFT JOIN empleados e ON e.id_empleado=f.id_empleado WHERE f.id_factura=?');
         $st->execute([$id]);
         return $st->fetch() ?: null;
+    }
+
+    public function saveOrUpdateClientFromInvoice(?int $idCliente, ?string $identificacion, ?string $nombre, ?string $apellidos, ?string $email, ?string $direccion): ?int
+    {
+        $this->ensureClientColumns();
+
+        $nombre = trim((string) $nombre);
+        $apellidos = trim((string) $apellidos);
+        $identificacion = trim((string) $identificacion);
+        $email = trim((string) $email);
+        $direccion = trim((string) $direccion);
+
+        if ($nombre === '' && $identificacion === '' && $email === '') {
+            return $idCliente > 0 ? $idCliente : null;
+        }
+
+        if ($idCliente !== null && $idCliente > 0) {
+            $existing = $this->oneById('clientes', 'id_cliente', $idCliente);
+            if ($existing) {
+                $useNombre = $nombre !== '' ? $nombre : (string) ($existing['nombre'] ?? '');
+                $useApellidos = $apellidos !== '' ? $apellidos : (string) ($existing['apellidos'] ?? '');
+                $useIdent = $identificacion !== '' ? $identificacion : (string) ($existing['identificacion'] ?? '');
+                $useEmail = $email !== '' ? $email : (string) ($existing['email'] ?? '');
+                $useDir = $direccion !== '' ? $direccion : (string) ($existing['direccion'] ?? '');
+
+                $this->updateClient($idCliente, $useNombre, $useApellidos, $useIdent, $useEmail, $useDir);
+                return $idCliente;
+            }
+        }
+
+        if ($identificacion !== '') {
+            $st = $this->db->prepare('SELECT id_cliente, nombre FROM clientes WHERE identificacion = ? LIMIT 1');
+            $st->execute([$identificacion]);
+            $found = $st->fetch();
+            if ($found) {
+                $foundId = (int) $found['id_cliente'];
+                $useNombre = $nombre !== '' ? $nombre : (string) $found['nombre'];
+                $this->updateClient($foundId, $useNombre, $apellidos ?: null, $identificacion, $email ?: null, $direccion ?: null);
+                return $foundId;
+            }
+        }
+
+        if ($email !== '') {
+            $st = $this->db->prepare('SELECT id_cliente, nombre FROM clientes WHERE email = ? LIMIT 1');
+            $st->execute([$email]);
+            $found = $st->fetch();
+            if ($found) {
+                $foundId = (int) $found['id_cliente'];
+                $useNombre = $nombre !== '' ? $nombre : (string) $found['nombre'];
+                $this->updateClient($foundId, $useNombre, $apellidos ?: null, $identificacion ?: null, $email, $direccion ?: null);
+                return $foundId;
+            }
+        }
+
+        $finalNombre = $nombre !== '' ? $nombre : ('Cliente ' . ($identificacion ?: 'General'));
+        $this->createClient($finalNombre, $apellidos ?: null, $identificacion ?: null, $email ?: null, $direccion ?: null);
+        return (int) $this->db->lastInsertId();
     }
 
     public function invoiceDetails(int $id): array
@@ -240,9 +504,11 @@ final class AdminModel extends Model
             $idFactura = (int) $this->db->lastInsertId();
             $insDet = $this->db->prepare('INSERT INTO detalle_factura(id_factura,id_producto,cantidad,precio_unitario,subtotal) VALUES(?,?,?,?,?)');
             $upd = $this->db->prepare('UPDATE productos SET stock=stock-? WHERE id_producto=?');
+            $insMov = $this->db->prepare('INSERT INTO movimientos_inventario(id_producto,tipo,cantidad,descripcion) VALUES(?,?,?,?)');
             foreach ($priced as [$pid, $qty, $price, $sub]) {
                 $insDet->execute([$idFactura, $pid, $qty, $price, $sub]);
                 $upd->execute([$qty, $pid]);
+                $insMov->execute([$pid, 'SALIDA', $qty, 'Venta Factura #' . $idFactura]);
             }
             $this->db->commit();
             return $idFactura;

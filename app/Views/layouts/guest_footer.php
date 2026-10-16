@@ -1,6 +1,7 @@
-    </div>
-    <p class="auth-footer" style="margin-top: 1.5rem; opacity: 0.7; font-size: 0.85rem; text-align: center;">Dolce Café &copy; <?= date('Y') ?> · Sistema de Gestión</p>
-</div>
+            </div><!-- /.auth-card.coffee-stain-content -->
+        </div><!-- /.coffee-splash-wrapper -->
+        <p class="auth-footer" style="margin-top: 0.85rem; opacity: 0.75; font-size: 0.8rem; text-align: center;">Dolce Café &copy; <?= date('Y') ?> · Sistema de Gestión</p>
+    </div><!-- /.auth-shell -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

@@ -40,7 +40,11 @@ CREATE TABLE `categorias` (
 
 CREATE TABLE `clientes` (
   `id_cliente` int(11) NOT NULL,
-  `nombre` varchar(150) NOT NULL
+  `identificacion` varchar(50) DEFAULT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `apellidos` varchar(150) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -228,7 +232,7 @@ ALTER TABLE `detalle_factura`
 --
 ALTER TABLE `facturas`
   ADD CONSTRAINT `facturas_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`),
-  ADD CONSTRAINT `facturas_ibfk_2` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`);
+  ADD CONSTRAINT `facturas_ibfk_2` FOREIGN KEY (`id_empleado`) REFERENCES `empleados` (`id_empleado`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `movimientos_inventario`
