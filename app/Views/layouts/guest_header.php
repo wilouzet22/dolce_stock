@@ -20,7 +20,7 @@ $pageTitle = $pageTitle ?? 'Acceso';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/admin.css?v=35">
+    <link rel="stylesheet" href="assets/css/admin.css?v=36">
 </head>
 <body class="admin admin--guest">
 <div class="auth-shell">
