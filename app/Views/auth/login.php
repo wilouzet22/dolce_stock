@@ -1,11 +1,11 @@
 <form method="post" action="<?= e(url('auth', 'login')) ?>">
     <div class="form-group">
-        <label for="email">Correo Electrónico</label>
-        <input id="email" name="email" type="email" required autocomplete="email" placeholder="ejemplo@dolcecafe.com" value="<?= e((string) ($_POST['email'] ?? '')) ?>">
+        <label for="email">Usuario o Correo Electrónico</label>
+        <input id="email" name="email" type="text" required autocomplete="username" placeholder="admin o valentina@dolcecafe.com" value="<?= e((string) ($_POST['email'] ?? '')) ?>">
     </div>
     <div class="form-group">
         <label for="password">Contraseña</label>
-        <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+        <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="admin o Dolce2024!">
     </div>
     <div class="form-actions auth-actions" style="margin-top:1.75rem;">
         <button type="submit" class="btn btn--primary" style="width:100%; justify-content:center;" <?= isset($authReady) && !$authReady ? 'disabled' : '' ?>>
