@@ -70,9 +70,16 @@ CREATE TABLE `detalle_factura` (
 
 CREATE TABLE `empleados` (
   `id_empleado` int(11) NOT NULL,
+  `primer_nombre` varchar(70) DEFAULT NULL,
+  `segundo_nombre` varchar(70) DEFAULT NULL,
+  `primer_apellido` varchar(70) DEFAULT NULL,
+  `segundo_apellido` varchar(70) DEFAULT NULL,
   `nombre` varchar(150) NOT NULL,
   `cargo` varchar(100) DEFAULT NULL,
-  `salario` decimal(10,2) DEFAULT NULL
+  `salario` decimal(10,2) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `password_hash` varchar(255) DEFAULT NULL,
+  `rol` enum('admin','cajero') NOT NULL DEFAULT 'cajero'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

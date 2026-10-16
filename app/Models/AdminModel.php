@@ -154,6 +154,14 @@ final class AdminModel extends Model
                 'SELECT COLUMN_NAME FROM information_schema.columns WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?'
             );
             
+            $st->execute([$dbName, 'empleados', 'primer_nombre']);
+            if (!$st->fetchColumn()) {
+                $this->db->exec("ALTER TABLE `empleados` 
+                    ADD COLUMN `primer_nombre` varchar(70) DEFAULT NULL AFTER `id_empleado`,
+                    ADD COLUMN `segundo_nombre` varchar(70) DEFAULT NULL AFTER `primer_nombre`,
+                    ADD COLUMN `primer_apellido` varchar(70) DEFAULT NULL AFTER `segundo_nombre`,
+                    ADD COLUMN `segundo_apellido` varchar(70) DEFAULT NULL AFTER `primer_apellido`");
+            }
             $st->execute([$dbName, 'empleados', 'email']);
             if (!$st->fetchColumn()) {
                 $this->db->exec("ALTER TABLE `empleados` ADD COLUMN `email` varchar(150) DEFAULT NULL AFTER `salario`, ADD COLUMN `password_hash` varchar(255) DEFAULT NULL AFTER `email`, ADD UNIQUE KEY `uq_empleados_email` (`email`)");
@@ -182,28 +190,49 @@ final class AdminModel extends Model
         return ((int) $st->fetchColumn()) > 0;
     }
 
-    public function createEmployee(string $nombre, ?string $cargo, ?float $salario, ?string $email = null, ?string $password = null, string $rol = 'cajero'): void
-    {
+    public function createEmployee(
+        string $nombre,
+        ?string $primerNombre = null,
+        ?string $segundoNombre = null,
+        ?string $primerApellido = null,
+        ?string $segundoApellido = null,
+        ?string $cargo = null,
+        ?float $salario = null,
+        ?string $email = null,
+        ?string $password = null,
+        string $rol = 'cajero'
+    ): void {
         $this->ensureAuthColumns();
         $emailNorm = ($email !== null && trim($email) !== '') ? mb_strtolower(trim($email)) : null;
         $hash = ($password !== null && trim($password) !== '') ? password_hash($password, PASSWORD_DEFAULT) : null;
 
-        $this->db->prepare('INSERT INTO empleados(nombre, cargo, salario, email, password_hash, rol) VALUES(?,?,?,?,?,?)')
-            ->execute([$nombre, $cargo, $salario, $emailNorm, $hash, $rol]);
+        $this->db->prepare('INSERT INTO empleados(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, nombre, cargo, salario, email, password_hash, rol) VALUES(?,?,?,?,?,?,?,?,?,?)')
+            ->execute([$primerNombre, $segundoNombre, $primerApellido, $segundoApellido, $nombre, $cargo, $salario, $emailNorm, $hash, $rol]);
     }
 
-    public function updateEmployee(int $id, string $nombre, ?string $cargo, ?float $salario, ?string $email = null, ?string $password = null, string $rol = 'cajero'): void
-    {
+    public function updateEmployee(
+        int $id,
+        string $nombre,
+        ?string $primerNombre = null,
+        ?string $segundoNombre = null,
+        ?string $primerApellido = null,
+        ?string $segundoApellido = null,
+        ?string $cargo = null,
+        ?float $salario = null,
+        ?string $email = null,
+        ?string $password = null,
+        string $rol = 'cajero'
+    ): void {
         $this->ensureAuthColumns();
         $emailNorm = ($email !== null && trim($email) !== '') ? mb_strtolower(trim($email)) : null;
 
         if ($password !== null && trim($password) !== '') {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $this->db->prepare('UPDATE empleados SET nombre=?, cargo=?, salario=?, email=?, password_hash=?, rol=? WHERE id_empleado=?')
-                ->execute([$nombre, $cargo, $salario, $emailNorm, $hash, $rol, $id]);
+            $this->db->prepare('UPDATE empleados SET primer_nombre=?, segundo_nombre=?, primer_apellido=?, segundo_apellido=?, nombre=?, cargo=?, salario=?, email=?, password_hash=?, rol=? WHERE id_empleado=?')
+                ->execute([$primerNombre, $segundoNombre, $primerApellido, $segundoApellido, $nombre, $cargo, $salario, $emailNorm, $hash, $rol, $id]);
         } else {
-            $this->db->prepare('UPDATE empleados SET nombre=?, cargo=?, salario=?, email=?, rol=? WHERE id_empleado=?')
-                ->execute([$nombre, $cargo, $salario, $emailNorm, $rol, $id]);
+            $this->db->prepare('UPDATE empleados SET primer_nombre=?, segundo_nombre=?, primer_apellido=?, segundo_apellido=?, nombre=?, cargo=?, salario=?, email=?, rol=? WHERE id_empleado=?')
+                ->execute([$primerNombre, $segundoNombre, $primerApellido, $segundoApellido, $nombre, $cargo, $salario, $emailNorm, $rol, $id]);
         }
     }
 

@@ -1,9 +1,12 @@
 <?php
 declare(strict_types=1);
+
 namespace App\Controllers;
+
 use App\Core\Controller;
 use App\Models\AdminModel;
 use PDOException;
+
 final class EmployeeController extends Controller
 {
     public function index(): void
@@ -12,12 +15,23 @@ final class EmployeeController extends Controller
         $m->ensureAuthColumns();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $a = $_POST['action'] ?? '';
+            $a = (string) ($_POST['action'] ?? '');
             $id = (int) ($_POST['id_empleado'] ?? 0);
-            $nombre = trim((string) ($_POST['nombre'] ?? ''));
+
+            $primerNombre = trim((string) ($_POST['primer_nombre'] ?? ''));
+            $segundoNombre = trim((string) ($_POST['segundo_nombre'] ?? '')) ?: null;
+            $primerApellido = trim((string) ($_POST['primer_apellido'] ?? ''));
+            $segundoApellido = trim((string) ($_POST['segundo_apellido'] ?? '')) ?: null;
+
+            if ($primerNombre !== '' || $primerApellido !== '') {
+                $nombre = trim(preg_replace('/\s+/', ' ', implode(' ', array_filter([$primerNombre, $segundoNombre, $primerApellido, $segundoApellido]))));
+            } else {
+                $nombre = trim((string) ($_POST['nombre'] ?? ''));
+            }
+
             $cargo = trim((string) ($_POST['cargo'] ?? '')) ?: null;
             $salario = null;
-            $email = trim((string) ($_POST['email'] ?? '')) ?: null;
+            $email = trim((string) ($_POST['email'] ?? ''));
             $password = (string) ($_POST['password'] ?? '');
             $rol = (string) ($_POST['rol'] ?? 'cajero');
 
@@ -25,49 +39,67 @@ final class EmployeeController extends Controller
                 $rol = 'cajero';
             }
 
-            if ($a === 'create' && $nombre !== '') {
-                if ($email !== null) {
-                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        flash('err', 'El formato del correo electrónico no es válido.');
-                        $this->redirect('employee');
-                    }
-                    if ($m->isEmailTaken($email)) {
-                        flash('err', 'Ese correo electrónico ya está registrado.');
-                        $this->redirect('employee');
-                    }
-                    if ($password !== '' && strlen($password) < 6) {
-                        flash('err', 'La contraseña debe tener al menos 6 caracteres.');
-                        $this->redirect('employee');
-                    }
+            if ($a === 'create') {
+                if ($primerNombre === '' || $primerApellido === '') {
+                    flash('err', 'El primer nombre y el primer apellido son campos obligatorios.');
+                    $this->redirect('employee');
                 }
-                $m->createEmployee($nombre, $cargo, $salario, $email, $password, $rol);
-                flash('ok', 'Empleado y cuenta registrados correctamente.');
+                if ($email === '') {
+                    flash('err', 'El correo electrónico es un campo obligatorio para el acceso del empleado.');
+                    $this->redirect('employee');
+                }
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    flash('err', 'El formato del correo electrónico no es válido.');
+                    $this->redirect('employee');
+                }
+                if ($m->isEmailTaken($email)) {
+                    flash('err', 'Ese correo electrónico ya está registrado.');
+                    $this->redirect('employee');
+                }
+                if ($password === '') {
+                    flash('err', 'La contraseña es un campo obligatorio para la cuenta del empleado.');
+                    $this->redirect('employee');
+                }
+                if (strlen($password) < 6) {
+                    flash('err', 'La contraseña debe tener al menos 6 caracteres.');
+                    $this->redirect('employee');
+                }
+
+                $m->createEmployee($nombre, $primerNombre, $segundoNombre, $primerApellido, $segundoApellido, $cargo, $salario, $email, $password, $rol);
+                flash('ok', 'Empleado y cuenta registrados exitosamente.');
+                $this->redirect('employee');
             }
 
-            if ($a === 'update' && $id > 0 && $nombre !== '') {
-                if ($email !== null) {
-                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        flash('err', 'El formato del correo electrónico no es válido.');
-                        $this->redirect('employee', 'index', ['edit' => $id]);
-                    }
-                    if ($m->isEmailTaken($email, $id)) {
-                        flash('err', 'Ese correo electrónico ya pertenece a otro empleado.');
-                        $this->redirect('employee', 'index', ['edit' => $id]);
-                    }
-                    if ($password !== '' && strlen($password) < 6) {
-                        flash('err', 'La contraseña debe tener al menos 6 caracteres.');
-                        $this->redirect('employee', 'index', ['edit' => $id]);
-                    }
+            if ($a === 'update' && $id > 0) {
+                if ($primerNombre === '' || $primerApellido === '') {
+                    flash('err', 'El primer nombre y el primer apellido son campos obligatorios.');
+                    $this->redirect('employee', 'index', ['edit' => $id]);
                 }
-                $m->updateEmployee($id, $nombre, $cargo, $salario, $email, $password, $rol);
+                if ($email === '') {
+                    flash('err', 'El correo electrónico es un campo obligatorio.');
+                    $this->redirect('employee', 'index', ['edit' => $id]);
+                }
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    flash('err', 'El formato del correo electrónico no es válido.');
+                    $this->redirect('employee', 'index', ['edit' => $id]);
+                }
+                if ($m->isEmailTaken($email, $id)) {
+                    flash('err', 'Ese correo electrónico ya pertenece a otro empleado.');
+                    $this->redirect('employee', 'index', ['edit' => $id]);
+                }
+                if ($password !== '' && strlen($password) < 6) {
+                    flash('err', 'La contraseña debe tener al menos 6 caracteres.');
+                    $this->redirect('employee', 'index', ['edit' => $id]);
+                }
+
+                $m->updateEmployee($id, $nombre, $primerNombre, $segundoNombre, $primerApellido, $segundoApellido, $cargo, $salario, $email, $password !== '' ? $password : null, $rol);
                 if ($id === (int) ($_SESSION['empleado_id'] ?? 0)) {
                     $_SESSION['empleado_nombre'] = $nombre;
-                    if ($email !== null) {
-                        $_SESSION['empleado_email'] = $email;
-                    }
+                    $_SESSION['empleado_email'] = $email;
                     $_SESSION['empleado_rol'] = $rol;
                 }
                 flash('ok', 'Empleado actualizado correctamente.');
+                $this->redirect('employee');
             }
 
             if ($a === 'delete' && $id > 0) {
@@ -77,11 +109,13 @@ final class EmployeeController extends Controller
                 }
                 try {
                     $m->deleteEmployee($id);
-                    flash('ok', 'Empleado eliminado.');
+                    flash('ok', 'Empleado eliminado correctamente.');
                 } catch (PDOException $e) {
-                    flash('err', 'No se puede eliminar: figura en facturas u otros registros.');
+                    flash('err', 'No se pudo eliminar el empleado: ' . $e->getMessage());
                 }
+                $this->redirect('employee');
             }
+
             $this->redirect('employee');
         }
 
