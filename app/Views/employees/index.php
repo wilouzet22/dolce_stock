@@ -1,6 +1,249 @@
 <?php
 $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
 ?>
+
+<style>
+/* ── Estilos Directos y Blindados del Recuadro Modal ─────────────────── */
+.modal-backdrop-emp {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(14, 6, 3, 0.72) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    z-index: 99998 !important;
+    display: none;
+    animation: empFadeIn 0.2s ease forwards;
+}
+
+.modal-box-emp {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 94% !important;
+    max-width: 600px !important;
+    max-height: 90vh !important;
+    background: #fbf6f0 !important;
+    color: #1e0a03 !important;
+    border: 2px solid rgba(139, 90, 43, 0.4) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.4) !important;
+    z-index: 99999 !important;
+    display: none;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    animation: empPopIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-theme="dark"] .modal-box-emp {
+    background: #23120b !important;
+    color: #f7ede8 !important;
+    border-color: rgba(229, 137, 35, 0.5) !important;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+@keyframes empFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes empPopIn {
+    from { opacity: 0; transform: translate(-50%, -46%) scale(0.95); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.modal-head-emp {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 1.25rem 1.75rem !important;
+    background: #f0e1d1 !important;
+    border-bottom: 1.5px solid rgba(139, 90, 43, 0.2) !important;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .modal-head-emp {
+    background: #190c07 !important;
+    border-bottom-color: rgba(229, 137, 35, 0.25) !important;
+}
+
+.modal-title-emp {
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    color: #1e0a03 !important;
+}
+
+[data-theme="dark"] .modal-title-emp {
+    color: #ffffff !important;
+}
+
+.modal-close-emp {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: rgba(139, 90, 43, 0.12) !important;
+    border: 1px solid rgba(139, 90, 43, 0.25) !important;
+    color: #1e0a03 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    padding: 0 !important;
+}
+
+[data-theme="dark"] .modal-close-emp {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.modal-close-emp:hover {
+    background: #ef4444 !important;
+    border-color: #dc2626 !important;
+    color: #ffffff !important;
+    transform: rotate(90deg) scale(1.1) !important;
+}
+
+.modal-body-emp {
+    padding: 1.5rem 1.75rem !important;
+    overflow-y: auto !important;
+    flex: 1;
+}
+
+.modal-footer-emp {
+    padding: 1.15rem 1.75rem !important;
+    border-top: 1.5px solid rgba(139, 90, 43, 0.18) !important;
+    background: #f0e1d1 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .modal-footer-emp {
+    background: #190c07 !important;
+    border-top-color: rgba(229, 137, 35, 0.25) !important;
+}
+
+.emp-grid-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+}
+
+@media (max-width: 580px) {
+    .emp-grid-2 {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.emp-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.emp-form-group label {
+    font-size: 0.86rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.35rem !important;
+    color: #1e0a03 !important;
+}
+
+[data-theme="dark"] .emp-form-group label {
+    color: #f7ede8 !important;
+}
+
+.emp-form-group input,
+.emp-form-group select {
+    background: #ffffff !important;
+    color: #1e0a03 !important;
+    border: 1.5px solid rgba(139, 90, 43, 0.35) !important;
+    border-radius: 10px !important;
+    padding: 0.65rem 0.9rem !important;
+    font-size: 0.92rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 42px !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-theme="dark"] .emp-form-group input,
+[data-theme="dark"] .emp-form-group select {
+    background: #170a05 !important;
+    color: #f7ede8 !important;
+    border-color: rgba(229, 137, 35, 0.35) !important;
+}
+
+.emp-form-group input:focus,
+.emp-form-group select:focus {
+    border-color: #e58923 !important;
+    box-shadow: 0 0 0 3.5px rgba(229, 137, 35, 0.25) !important;
+    outline: none !important;
+}
+
+.emp-form-group input.is-invalid,
+.emp-form-group select.is-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3.5px rgba(239, 68, 68, 0.22) !important;
+    background-color: #fff5f5 !important;
+}
+
+[data-theme="dark"] .emp-form-group input.is-invalid,
+[data-theme="dark"] .emp-form-group select.is-invalid {
+    background-color: #2b0b08 !important;
+}
+
+.emp-err-msg {
+    display: none;
+    color: #ef4444;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-top: 0.35rem;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.emp-err-msg.is-active {
+    display: flex;
+}
+
+.emp-pass-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.emp-pass-wrapper input {
+    padding-right: 2.75rem !important;
+}
+
+.emp-pass-btn {
+    position: absolute;
+    right: 0.65rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8b5a2b;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-theme="dark"] .emp-pass-btn {
+    color: #e58923;
+}
+</style>
+
 <div class="stacked-layout">
     <div class="card">
         <div class="card-head" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
@@ -10,7 +253,7 @@ $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
             </div>
             <button type="button" class="btn btn--primary" id="btn-nuevo-emp">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Nuevo Empleado
+                + Nuevo Empleado
             </button>
         </div>
 
@@ -42,7 +285,6 @@ $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
                                 $isSelf = ((int) $emp['id_empleado'] === $currentUserId); 
                                 $rolVal = !empty($emp['rol']) ? strtolower($emp['rol']) : ((stripos($emp['cargo'] ?? '', 'admin') !== false || stripos($emp['cargo'] ?? '', 'jefe') !== false) ? 'admin' : 'cajero');
 
-                                // Descomponer nombres si no están en campos separados
                                 $pNom = (string) ($emp['primer_nombre'] ?? '');
                                 $sNom = (string) ($emp['segundo_nombre'] ?? '');
                                 $pApe = (string) ($emp['primer_apellido'] ?? '');
@@ -136,82 +378,85 @@ $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
     </div>
 </div>
 
-<!-- ── Recuadro Modal: Añadir / Editar Empleado ────────────────────────── -->
-<div class="modal-backdrop" id="modal-emp-backdrop" style="display:none;"></div>
-<div class="modal-box" id="modal-emp-box" style="display:none; max-width:620px;">
-    <div class="modal-head">
-        <h3 class="modal-title" id="emp-modal-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+<!-- ── Recuadro Modal en Pantalla: Añadir / Editar Empleado ─────────────── -->
+<div class="modal-backdrop-emp" id="modal-emp-backdrop"></div>
+
+<div class="modal-box-emp" id="modal-emp-box" role="dialog" aria-modal="true" aria-labelledby="emp-modal-title-text">
+    <!-- Cabecera del Recuadro con la X en la parte de arriba -->
+    <div class="modal-head-emp">
+        <h3 class="modal-title-emp" id="emp-modal-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <span id="emp-modal-title-text">Añadir Nuevo Empleado</span>
         </h3>
-        <button type="button" class="modal-close" id="modal-emp-close-btn" aria-label="Cerrar ventana">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <!-- Botón X arriba a la derecha para quitar el recuadro -->
+        <button type="button" class="modal-close-emp" id="modal-emp-close-btn" title="Cerrar ventana (Esc)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
 
-    <form method="post" action="<?= e(url('employee')) ?>" id="form-empleado" novalidate>
+    <form method="post" action="<?= e(url('employee')) ?>" id="form-empleado" novalidate style="margin:0; display:flex; flex-direction:column; flex:1; overflow:hidden;">
         <input type="hidden" name="action" id="emp-action" value="create">
         <input type="hidden" name="id_empleado" id="emp-id" value="">
 
-        <div class="modal-body" style="padding:1.5rem 1.75rem;">
+        <div class="modal-body-emp">
             <div style="display:flex; flex-direction:column; gap:1.15rem;">
                 
-                <!-- Nombres -->
-                <div class="form-grid--2">
-                    <div class="form-group">
+                <!-- Fila 1: Primer Nombre y Segundo Nombre -->
+                <div class="emp-grid-2">
+                    <div class="emp-form-group">
                         <label for="emp-primer-nombre">
-                            Primer Nombre <span class="required-star">*</span>
+                            Primer Nombre <span style="color:#ef4444; font-weight:700;">*</span>
                         </label>
                         <input id="emp-primer-nombre" name="primer_nombre" required maxlength="70" placeholder="Ej: Mariana, Carlos..." autocomplete="off">
-                        <span class="field-error-msg" id="err-emp-primer-nombre">
+                        <span class="emp-err-msg" id="err-emp-primer-nombre">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                             Campo obligatorio
                         </span>
                     </div>
 
-                    <div class="form-group">
+                    <div class="emp-form-group">
                         <label for="emp-segundo-nombre">
-                            Segundo Nombre <span class="optional">(opcional)</span>
+                            Segundo Nombre <span style="font-size:0.78rem; font-weight:400; color:var(--text-muted);">(opcional)</span>
                         </label>
                         <input id="emp-segundo-nombre" name="segundo_nombre" maxlength="70" placeholder="Ej: Sofía, Alberto..." autocomplete="off">
                     </div>
                 </div>
 
-                <!-- Apellidos -->
-                <div class="form-grid--2">
-                    <div class="form-group">
+                <!-- Fila 2: Primer Apellido y Segundo Apellido -->
+                <div class="emp-grid-2">
+                    <div class="emp-form-group">
                         <label for="emp-primer-apellido">
-                            Primer Apellido <span class="required-star">*</span>
+                            Primer Apellido <span style="color:#ef4444; font-weight:700;">*</span>
                         </label>
                         <input id="emp-primer-apellido" name="primer_apellido" required maxlength="70" placeholder="Ej: Perea, Gómez..." autocomplete="off">
-                        <span class="field-error-msg" id="err-emp-primer-apellido">
+                        <span class="emp-err-msg" id="err-emp-primer-apellido">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                             Campo obligatorio
                         </span>
                     </div>
 
-                    <div class="form-group">
+                    <div class="emp-form-group">
                         <label for="emp-segundo-apellido">
-                            Segundo Apellido <span class="optional">(opcional)</span>
+                            Segundo Apellido <span style="font-size:0.78rem; font-weight:400; color:var(--text-muted);">(opcional)</span>
                         </label>
                         <input id="emp-segundo-apellido" name="segundo_apellido" maxlength="70" placeholder="Ej: Cano, Martínez..." autocomplete="off">
                     </div>
                 </div>
 
-                <!-- Cargo y Rol -->
-                <div class="form-grid--2">
-                    <div class="form-group">
+                <!-- Fila 3: Cargo y Rol -->
+                <div class="emp-grid-2">
+                    <div class="emp-form-group">
                         <label for="emp-cargo">
-                            Cargo / Puesto <span class="optional">(opcional)</span>
+                            Cargo / Puesto <span style="font-size:0.78rem; font-weight:400; color:var(--text-muted);">(opcional)</span>
                         </label>
                         <input id="emp-cargo" name="cargo" maxlength="100" placeholder="Ej: Barista, Cajero, Administrador..." autocomplete="off">
                     </div>
 
-                    <div class="form-group">
+                    <div class="emp-form-group">
                         <label for="emp-rol">
-                            Rol / Permisos del Sistema
+                            Rol / Nivel de Acceso
                         </label>
-                        <select id="emp-rol" name="rol" class="form-select">
+                        <select id="emp-rol" name="rol">
                             <option value="cajero">Cajero (Ventas y Facturas)</option>
                             <option value="admin">Administrador (Acceso Completo)</option>
                         </select>
@@ -219,39 +464,39 @@ $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
                 </div>
 
                 <!-- Separador de Credenciales -->
-                <div style="padding-top:0.75rem; border-top:1px solid var(--border-color); margin-top:0.25rem;">
+                <div style="padding-top:0.75rem; border-top:1.5px solid rgba(139, 90, 43, 0.2); margin-top:0.25rem;">
                     <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        <h4 style="font-size:0.92rem; font-weight:700; margin:0; color:var(--text-main);">Credenciales de Ingreso a Empleados</h4>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e58923" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <h4 style="font-size:0.95rem; font-weight:800; margin:0; color:#1e0a03;">Credenciales de Ingreso al Sistema</h4>
                     </div>
-                    <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 0.85rem 0;">Con este correo y contraseña el colaborador podrá iniciar sesión en el sistema.</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 0.85rem 0;">Con este correo y contraseña el colaborador podrá iniciar sesión en Dolce Stock.</p>
                 </div>
 
-                <!-- Correo Electrónico -->
-                <div class="form-group">
+                <!-- Correo Electrónico (Obligatorio) -->
+                <div class="emp-form-group">
                     <label for="emp-email">
-                        Correo Electrónico <span class="required-star">*</span>
+                        Correo Electrónico <span style="color:#ef4444; font-weight:700;">*</span>
                     </label>
                     <input id="emp-email" name="email" type="email" required placeholder="ejemplo@dolcecafe.com" autocomplete="off">
-                    <span class="field-error-msg" id="err-emp-email">
+                    <span class="emp-err-msg" id="err-emp-email">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                         El correo electrónico es un campo obligatorio
                     </span>
                 </div>
 
-                <!-- Contraseña -->
-                <div class="form-group">
+                <!-- Contraseña (Obligatoria al crear) -->
+                <div class="emp-form-group">
                     <label for="emp-password">
-                        Contraseña <span class="required-star" id="emp-pass-star">*</span>
-                        <span class="optional" id="emp-pass-hint">(mínimo 6 caracteres)</span>
+                        Contraseña <span style="color:#ef4444; font-weight:700;" id="emp-pass-star">*</span>
+                        <span id="emp-pass-hint" style="font-size:0.78rem; font-weight:400; color:var(--text-muted);">(mínimo 6 caracteres)</span>
                     </label>
-                    <div class="password-input-wrapper">
+                    <div class="emp-pass-wrapper">
                         <input id="emp-password" name="password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
-                        <button type="button" class="password-toggle-btn" id="btn-toggle-password" aria-label="Mostrar u ocultar contraseña">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <button type="button" class="emp-pass-btn" id="btn-toggle-password" title="Ver / Ocultar contraseña">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
                     </div>
-                    <span class="field-error-msg" id="err-emp-password">
+                    <span class="emp-err-msg" id="err-emp-password">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                         La contraseña es un campo obligatorio
                     </span>
@@ -260,7 +505,8 @@ $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
             </div>
         </div>
 
-        <div class="modal-footer">
+        <!-- Pie del Recuadro con Botones -->
+        <div class="modal-footer-emp">
             <button type="button" class="btn btn--ghost" id="modal-emp-cancel-btn">Cancelar</button>
             <button type="submit" class="btn btn--primary" id="modal-emp-submit-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -290,7 +536,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const titleText  = document.getElementById('emp-modal-title-text');
     const submitText = document.getElementById('modal-emp-btn-text');
 
-    // Mensajes de error
     const errPNombre = document.getElementById('err-emp-primer-nombre');
     const errPApe    = document.getElementById('err-emp-primer-apellido');
     const errEmail   = document.getElementById('err-emp-email');
@@ -301,7 +546,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (input) input.classList.remove('is-invalid');
         });
         [errPNombre, errPApe, errEmail, errPass].forEach(err => {
-            if (err) err.classList.remove('is-visible');
+            if (err) err.classList.remove('is-active');
         });
     }
 
@@ -311,36 +556,35 @@ document.addEventListener('DOMContentLoaded', function () {
             if (message) {
                 errSpan.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> ' + message;
             }
-            errSpan.classList.add('is-visible');
+            errSpan.classList.add('is-active');
         }
     }
 
-    // Limpiar error al tipear
     [pNombreInp, pApeInp, emailInp, passInp].forEach(input => {
         if (input) {
             input.addEventListener('input', function() {
                 this.classList.remove('is-invalid');
                 const errSpan = document.getElementById('err-' + this.id);
-                if (errSpan) errSpan.classList.remove('is-visible');
+                if (errSpan) errSpan.classList.remove('is-active');
             });
         }
     });
 
-    // Toggle ver contraseña
+    // Toggle de contraseña
     const togglePassBtn = document.getElementById('btn-toggle-password');
     if (togglePassBtn) {
         togglePassBtn.addEventListener('click', function () {
             const isPass = passInp.getAttribute('type') === 'password';
             passInp.setAttribute('type', isPass ? 'text' : 'password');
             this.innerHTML = isPass 
-                ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
-                : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+                ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
         });
     }
 
     function openModal() {
         backdrop.style.display = 'block';
-        modalBox.style.display = 'block';
+        modalBox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 
@@ -372,11 +616,11 @@ document.addEventListener('DOMContentLoaded', function () {
             passInp.setAttribute('type', 'password');
             rolInp.value = 'cajero';
             openModal();
-            setTimeout(() => pNombreInp.focus(), 80);
+            setTimeout(() => pNombreInp.focus(), 100);
         });
     }
 
-    // Botones "Editar" en la tabla
+    // Botones "Editar"
     document.querySelectorAll('.btn-edit-emp').forEach(function (btn) {
         btn.addEventListener('click', function () {
             form.reset();
@@ -399,11 +643,11 @@ document.addEventListener('DOMContentLoaded', function () {
             titleText.textContent = 'Editar Empleado';
             submitText.textContent = 'Guardar Cambios';
             openModal();
-            setTimeout(() => pNombreInp.focus(), 80);
+            setTimeout(() => pNombreInp.focus(), 100);
         });
     });
 
-    // Validación estricta antes de enviar el formulario
+    // Validación del formulario
     form.addEventListener('submit', function (e) {
         clearErrors();
         let hasErrors = false;
@@ -411,21 +655,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const isCreate = actionInp.value === 'create';
 
-        // 1. Primer Nombre
         if (!pNombreInp.value.trim()) {
             showFieldError(pNombreInp, errPNombre, 'El primer nombre es un campo obligatorio');
             hasErrors = true;
             if (!firstInvalid) firstInvalid = pNombreInp;
         }
 
-        // 2. Primer Apellido
         if (!pApeInp.value.trim()) {
             showFieldError(pApeInp, errPApe, 'El primer apellido es un campo obligatorio');
             hasErrors = true;
             if (!firstInvalid) firstInvalid = pApeInp;
         }
 
-        // 3. Correo Electrónico (Obligatorio)
         const emailVal = emailInp.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailVal) {
@@ -438,7 +679,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!firstInvalid) firstInvalid = emailInp;
         }
 
-        // 4. Contraseña (Obligatoria al crear)
         const passVal = passInp.value;
         if (isCreate) {
             if (!passVal) {
@@ -451,7 +691,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!firstInvalid) firstInvalid = passInp;
             }
         } else {
-            // En edición, si escribe algo, debe tener al menos 6 caracteres
             if (passVal && passVal.length < 6) {
                 showFieldError(passInp, errPass, 'La nueva contraseña debe tener al menos 6 caracteres');
                 hasErrors = true;
@@ -465,22 +704,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Cerrar modal
+    // Quitar recuadro con la X en la parte de arriba
     const closeBtn = document.getElementById('modal-emp-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
+    // Quitar recuadro con Cancelar
     const cancelBtn = document.getElementById('modal-emp-cancel-btn');
     if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
 
+    // Quitar recuadro haciendo clic fuera (backdrop)
     if (backdrop) backdrop.addEventListener('click', closeModal);
 
+    // Quitar recuadro con tecla Escape
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modalBox.style.display === 'block') {
+        if (e.key === 'Escape' && modalBox.style.display === 'flex') {
             closeModal();
         }
     });
 
-    // Si viene con ?edit= en la URL
+    // Abrir automáticamente si vino con ?edit= desde URL
     <?php if ($row) : ?>
     (function() {
         actionInp.value = 'update';
@@ -490,7 +732,6 @@ document.addEventListener('DOMContentLoaded', function () {
         pApeInp.value = <?= json_encode((string) ($row['primer_apellido'] ?? '')) ?>;
         sApeInp.value = <?= json_encode((string) ($row['segundo_apellido'] ?? '')) ?>;
         
-        // Si estaban vacíos pero hay nombre completo
         if (!pNombreInp.value && !pApeInp.value) {
             const raw = <?= json_encode((string) ($row['nombre'] ?? '')) ?>;
             const pts = raw.trim().split(/\s+/);
