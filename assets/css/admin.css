@@ -1435,10 +1435,14 @@ textarea:disabled {
 
 /* Pantallas Guest (Auth Login / Register) - Spill Concept */
 :root {
-  --stain-color-main: #361B0D;
-  --stain-color-accent: #5C2B14;
-  --stain-border: rgba(226, 141, 56, 0.35);
-  --stain-glow: rgba(192, 92, 20, 0.25);
+  /* Modo claro: tonos café latte, marrón medio — mancha más clara y natural */
+  --stain-color-main: #8B5230;
+  --stain-color-accent: #A0622A;
+  --stain-border: rgba(139, 82, 48, 0.5);
+  --stain-glow: rgba(160, 98, 42, 0.35);
+  --stain-ring1: rgba(185, 120, 65, 0.28);
+  --stain-ring2: rgba(100, 55, 20, 0.18);
+  --stain-splat: rgba(115, 65, 25, 0.22);
 }
 
 [data-theme="dark"] {
@@ -1446,6 +1450,66 @@ textarea:disabled {
   --stain-color-accent: #48210F;
   --stain-border: rgba(226, 141, 56, 0.45);
   --stain-glow: rgba(226, 141, 56, 0.3);
+  --stain-ring1: rgba(226, 141, 56, 0.22);
+  --stain-ring2: rgba(80, 30, 10, 0.3);
+  --stain-splat: rgba(226, 141, 56, 0.12);
+}
+
+/* ── Animación flotante: granos de café y tazas ────────────── */
+@keyframes floatBean {
+  0%   { transform: translateY(0px) rotate(0deg) scale(1); opacity: 0.7; }
+  25%  { transform: translateY(-18px) rotate(8deg) scale(1.05); opacity: 0.85; }
+  50%  { transform: translateY(-8px) rotate(-5deg) scale(0.97); opacity: 0.75; }
+  75%  { transform: translateY(-22px) rotate(12deg) scale(1.03); opacity: 0.9; }
+  100% { transform: translateY(0px) rotate(0deg) scale(1); opacity: 0.7; }
+}
+
+@keyframes driftBean {
+  0%   { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.6; }
+  33%  { transform: translateY(-14px) translateX(8px) rotate(-10deg); opacity: 0.8; }
+  66%  { transform: translateY(-6px) translateX(-6px) rotate(15deg); opacity: 0.65; }
+  100% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.6; }
+}
+
+@keyframes floatCup {
+  0%   { transform: translateY(0px) rotate(-5deg); opacity: 0.55; }
+  40%  { transform: translateY(-16px) rotate(3deg); opacity: 0.7; }
+  70%  { transform: translateY(-10px) rotate(-8deg); opacity: 0.6; }
+  100% { transform: translateY(0px) rotate(-5deg); opacity: 0.55; }
+}
+
+/* Canvas de fondo de la auth-shell */
+.auth-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.auth-bg-item {
+  position: absolute;
+  opacity: 0;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.auth-bg-item svg {
+  display: block;
+}
+
+/* Asegurar que el contenido del login esté sobre las animaciones */
+.auth-shell > *:not(.auth-bg-canvas) {
+  position: relative;
+  z-index: 2;
 }
 
 .auth-shell {
@@ -1454,185 +1518,394 @@ textarea:disabled {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem 1rem;
+  padding: 2.5rem 1rem 2rem;
   position: relative;
   overflow-x: hidden;
 }
 
-.auth-header-toggle {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  z-index: 20;
-}
-
-/* Spill Auth Main Layout Container */
-.spill-auth-container {
-  display: flex;
-  flex-direction: row;
+/* ── Botón Selector de Tema (Modo Claro / Modo Oscuro) ────── */
+.theme-toggle-btn {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-  max-width: 1120px;
-  margin: 1.5rem auto;
-  gap: 0;
-  z-index: 2;
+  gap: 0.65rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-full, 999px);
+  cursor: pointer;
+  font-family: var(--font-body, inherit);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: var(--bg-surface, #ffffff);
+  border: 1.5px solid var(--border-strong, rgba(75, 38, 15, 0.42));
+  color: var(--text-main, #1e0a03);
+  box-shadow: 0 4px 14px rgba(45, 24, 10, 0.12);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
 }
 
-/* Hero Coffee Cup - Taza Estilizada Inclinada Derramando */
-.coffee-cup-hero {
-  position: relative;
-  z-index: 6;
+.theme-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(45, 24, 10, 0.2), 0 0 12px var(--accent-glow, rgba(226, 141, 56, 0.3));
+  border-color: var(--accent, #d35400);
+}
+
+.theme-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.theme-toggle-btn svg {
+  width: 19px;
+  height: 19px;
+  color: var(--accent, #d35400);
+  transition: transform 0.35s ease;
   flex-shrink: 0;
-  margin-right: -55px;
-  margin-top: -15px;
-  transform: rotate(-16deg);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.coffee-cup-hero:hover {
-  transform: rotate(-13deg) translateY(-4px);
+.theme-toggle-btn:hover svg {
+  transform: rotate(20deg) scale(1.12);
 }
 
-.coffee-cup-wrapper {
-  width: 320px;
-  height: 250px;
-  filter: drop-shadow(0 16px 32px rgba(18, 6, 2, 0.5));
+/* Posición fija y destacada en la pantalla de autenticación */
+.auth-header-toggle {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.75rem;
+  z-index: 1000;
 }
 
-.coffee-cup-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+/* En pantalla de Login: apariencia flotante y nítida */
+.auth-header-toggle .theme-toggle-btn {
+  background: #ffffff;
+  color: #2e1307;
+  border: 2px solid rgba(139, 82, 48, 0.35);
+  box-shadow: 0 6px 20px rgba(50, 20, 5, 0.18);
 }
 
-/* Contenedor Mancha de Café - Blob Salpicón Amplio */
-.coffee-splash-wrapper {
+[data-theme="dark"] .auth-header-toggle .theme-toggle-btn {
+  background: #1e0b04;
+  color: #fed7aa;
+  border: 2px solid rgba(226, 141, 56, 0.65);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65), 0 0 14px rgba(226, 141, 56, 0.25);
+}
+
+[data-theme="dark"] .auth-header-toggle .theme-toggle-btn svg {
+  color: #ff9b38;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   TAZA DE CAFÉ (COFFEE CUP AUTH WRAPPER)
+   Modo Claro: Blanco Opaco cálido tipo cerámica artesanal
+   Modo Oscuro: Taza blanca pura con brillo cerámico elegante
+   ═════════════════════════════════════════════════════════════ */
+
+.coffee-cup-auth-wrapper {
   position: relative;
   width: 100%;
-  max-width: 660px;
+  max-width: 480px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 5rem 4rem;
+  margin: 1.5rem auto 1rem;
+  z-index: 10;
 }
 
-.coffee-stain-bg {
-  position: absolute;
-  top: -115px;
-  left: -135px;
-  right: -135px;
-  bottom: -115px;
-  z-index: 1;
+/* ── Vapor saliendo de la taza ─────────────────────────────── */
+.cup-steam-container {
+  width: 160px;
+  height: 52px;
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 5;
   pointer-events: none;
 }
 
-.stain-shape-svg {
+.cup-steam-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.58)) drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  overflow: visible;
+  color: rgba(160, 100, 60, 0.55);
 }
 
-.stain-path-outer {
-  fill: var(--stain-color-main);
-  stroke: var(--stain-border);
-  stroke-width: 1.5;
-  transition: fill 0.3s ease, stroke 0.3s ease;
+[data-theme="dark"] .cup-steam-svg {
+  color: rgba(255, 230, 205, 0.6);
 }
 
-.stain-path-inner {
-  fill: var(--stain-color-accent);
+.steam-line {
+  stroke-dasharray: 70;
+  stroke-dashoffset: 70;
+  animation: steamRise 3.5s ease-in-out infinite;
 }
 
-/* Contenido del login sin recuadro — directo sobre la mancha */
-.auth-card.coffee-stain-content {
+.steam-1 {
+  animation-delay: 0s;
+}
+
+.steam-2 {
+  animation-delay: 1.2s;
+}
+
+.steam-3 {
+  animation-delay: 0.6s;
+}
+
+@keyframes steamRise {
+  0% {
+    stroke-dashoffset: 70;
+    opacity: 0;
+    transform: translateY(6px) scale(0.95);
+  }
+  30% {
+    opacity: 0.85;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+    transform: translateY(-16px) scale(1.08);
+  }
+}
+
+/* ── Cuerpo Principal de la Taza de Café ────────────────────── */
+.coffee-cup-card {
   position: relative;
-  z-index: 5;
   width: 100%;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: none;
-  border-radius: 0;
-  padding: 2rem 2.5rem;
-  box-shadow: none;
+  padding: 2.25rem 2.5rem 2.6rem;
+  box-sizing: border-box;
+
+  /* Forma de taza: boca ligeramente ancha, base redondeada */
+  border-radius: 26px 26px 85px 85px;
+
+  /* Modo Claro: Blanco Opaco elegante */
+  background: linear-gradient(175deg, #ffffff 0%, #faf8f5 42%, #f5efe7 100%);
+  border: 2.5px solid rgba(195, 160, 135, 0.45);
+  box-shadow:
+    0 24px 55px rgba(60, 25, 10, 0.22),
+    0 8px 22px rgba(60, 25, 10, 0.12),
+    inset 0 3px 5px rgba(255, 255, 255, 0.95),
+    inset 0 -12px 24px rgba(185, 145, 115, 0.16);
+  transition: all 0.35s ease;
 }
 
-.auth-brand {
+/* Modo Oscuro: Taza blanca contrastante con resplandor suave */
+[data-theme="dark"] .coffee-cup-card {
+  background: linear-gradient(175deg, #ffffff 0%, #fbfbfb 45%, #f0f3f6 100%);
+  border: 2.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.85),
+    0 0 35px rgba(255, 255, 255, 0.16),
+    inset 0 3px 6px #ffffff,
+    inset 0 -14px 26px rgba(160, 180, 200, 0.25);
+}
+
+/* ── Asa de la Taza (derecha) ──────────────────────────────── */
+.cup-handle {
+  position: absolute;
+  right: -52px;
+  top: 24%;
+  width: 58px;
+  height: 145px;
+  box-sizing: border-box;
+  border-radius: 0 65px 65px 0;
+  border: 15px solid #faf6f1;
+  border-left: none;
+  box-shadow:
+    6px 8px 20px rgba(50, 20, 5, 0.16),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  z-index: -1;
+  transition: all 0.35s ease;
+}
+
+[data-theme="dark"] .cup-handle {
+  border-color: #ffffff;
+  box-shadow:
+    6px 10px 28px rgba(0, 0, 0, 0.65),
+    0 0 16px rgba(255, 255, 255, 0.18),
+    inset 0 2px 4px rgba(255, 255, 255, 1);
+}
+
+/* ── Borde superior y línea de crema de café ──────────────── */
+.cup-top-rim {
+  width: 100%;
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.cup-crema-line {
+  width: 75%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent 0%, #7a411e 20%, #c47c3e 50%, #7a411e 80%, transparent 100%);
+  opacity: 0.85;
+  box-shadow: 0 2px 6px rgba(70, 30, 10, 0.35);
+}
+
+/* ── Platito / Plato base de la Taza ────────────────────────── */
+.cup-saucer {
+  width: 90%;
+  max-width: 440px;
+  height: 20px;
+  border-radius: 50%;
+  margin-top: -9px;
+  background: linear-gradient(180deg, #ffffff 0%, #ece2d5 100%);
+  border: 1.5px solid rgba(185, 145, 115, 0.3);
+  box-shadow:
+    0 16px 36px rgba(45, 18, 5, 0.22),
+    0 4px 10px rgba(45, 18, 5, 0.12),
+    inset 0 2px 4px rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+  z-index: 4;
+  transition: all 0.35s ease;
+}
+
+[data-theme="dark"] .cup-saucer {
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.85),
+    0 0 22px rgba(255, 255, 255, 0.18),
+    inset 0 2px 5px #ffffff;
+}
+
+/* ── Tipografía y Elementos dentro de la Taza Blanca ───────── */
+.cup-body-content {
+  position: relative;
+  z-index: 6;
+  width: 100%;
+}
+
+.cup-body-content .auth-brand {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
-.auth-brand-logo-wrapper {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 0.75rem;
-  border-radius: var(--radius-lg);
+.cup-body-content .auth-brand-logo-wrapper {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 0.65rem;
+  border-radius: var(--radius-lg, 16px);
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(255, 150, 50, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #180802;
+  box-shadow: 0 6px 18px rgba(35, 15, 5, 0.3), inset 0 0 10px rgba(226, 141, 56, 0.3);
+  border: 2px solid rgba(226, 141, 56, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.auth-brand-logo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.cup-body-content .auth-brand-text {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #271004 !important;
+  letter-spacing: -0.02em;
+  text-shadow: none !important;
   display: block;
 }
 
-.auth-brand-text {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #FDF4E3;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.auth-title {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
+.cup-body-content .auth-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.35rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: #FDF4E3;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  color: #55270f !important;
+  text-shadow: none !important;
 }
 
-/* Form labels inside coffee stain */
-.coffee-stain-content label {
-  color: #F7EBE0 !important;
-  font-weight: 600;
+.cup-body-content label {
+  color: #2b1205 !important;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-bottom: 0.45rem;
+  display: block;
 }
 
-/* Responsividad para móviles */
-@media (max-width: 768px) {
-  .spill-auth-container {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 2.5rem;
-  }
+.cup-body-content input {
+  background: #f6f1ec !important;
+  border: 1.5px solid #d5c3b4 !important;
+  color: #1e0a02 !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  font-family: inherit !important;
+  box-shadow: inset 0 2px 4px rgba(60, 25, 10, 0.05) !important;
+  transition: all 0.2s ease !important;
+}
 
-  .coffee-cup-hero {
-    margin-right: 0;
-    margin-bottom: -35px;
-    margin-top: 0;
-    transform: rotate(-10deg);
-  }
+.cup-body-content input::placeholder {
+  color: #9c8371 !important;
+}
 
-  .coffee-cup-wrapper {
-    width: 240px;
-    height: 190px;
-  }
+.cup-body-content input:focus {
+  background: #ffffff !important;
+  border-color: #d35400 !important;
+  box-shadow: 0 0 0 3px rgba(211, 84, 0, 0.22) !important;
+  outline: none !important;
+}
 
-  .coffee-splash-wrapper {
+.cup-body-content .btn--primary {
+  background: linear-gradient(135deg, #d35400 0%, #b84300 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 0.85rem 1.5rem !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  box-shadow: 0 8px 22px rgba(184, 67, 0, 0.35) !important;
+  transition: all 0.25s ease !important;
+  cursor: pointer;
+}
+
+.cup-body-content .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(184, 67, 0, 0.45) !important;
+  background: linear-gradient(135deg, #e05d05 0%, #c44800 100%) !important;
+}
+
+.cup-body-content .btn--primary:active {
+  transform: translateY(0);
+}
+
+.coffee-cup-auth-wrapper .auth-footer {
+  margin-top: 1.5rem;
+  font-size: 0.82rem;
+  color: var(--text-muted, #5a341b);
+  opacity: 0.85;
+  text-align: center;
+}
+
+/* ── Responsividad Móvil ───────────────────────────────────── */
+@media (max-width: 620px) {
+  .coffee-cup-auth-wrapper {
     max-width: 100%;
-    padding: 3rem 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .coffee-cup-card {
+    padding: 2rem 1.6rem 2.2rem;
+    border-radius: 22px 22px 65px 65px;
+  }
+
+  .cup-handle {
+    right: -32px;
+    width: 38px;
+    height: 115px;
+    border-width: 11px;
+  }
+
+  .auth-header-toggle {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .theme-toggle-btn {
+    padding: 0.5rem 0.95rem;
+    font-size: 0.82rem;
   }
 }
 
