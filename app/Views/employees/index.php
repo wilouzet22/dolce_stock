@@ -443,24 +443,15 @@ $currentUserId = (int) ($_SESSION['empleado_id'] ?? 0);
                     </div>
                 </div>
 
-                <!-- Fila 3: Cargo y Rol -->
-                <div class="emp-grid-2">
-                    <div class="emp-form-group">
-                        <label for="emp-cargo">
-                            Cargo / Puesto <span style="font-size:0.78rem; font-weight:400; color:var(--text-muted);">(opcional)</span>
-                        </label>
-                        <input id="emp-cargo" name="cargo" maxlength="100" placeholder="Ej: Barista, Cajero, Administrador..." autocomplete="off">
-                    </div>
-
-                    <div class="emp-form-group">
-                        <label for="emp-rol">
-                            Rol / Nivel de Acceso
-                        </label>
-                        <select id="emp-rol" name="rol">
-                            <option value="cajero">Cajero (Ventas y Facturas)</option>
-                            <option value="admin">Administrador (Acceso Completo)</option>
-                        </select>
-                    </div>
+                <!-- Rol / Nivel de Acceso (Opción a elegir: Administrador o Cajero) -->
+                <div class="emp-form-group">
+                    <label for="emp-rol">
+                        Rol / Nivel de Acceso <span style="color:#ef4444; font-weight:700;">*</span>
+                    </label>
+                    <select id="emp-rol" name="rol" required>
+                        <option value="cajero">Cajero</option>
+                        <option value="admin">Administrador</option>
+                    </select>
                 </div>
 
                 <!-- Separador de Credenciales -->
@@ -527,7 +518,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const sNombreInp = document.getElementById('emp-segundo-nombre');
     const pApeInp    = document.getElementById('emp-primer-apellido');
     const sApeInp    = document.getElementById('emp-segundo-apellido');
-    const cargoInp   = document.getElementById('emp-cargo');
     const emailInp   = document.getElementById('emp-email');
     const passInp    = document.getElementById('emp-password');
     const passStar   = document.getElementById('emp-pass-star');
@@ -631,7 +621,6 @@ document.addEventListener('DOMContentLoaded', function () {
             sNombreInp.value = this.dataset.segundoNombre || '';
             pApeInp.value = this.dataset.primerApellido || '';
             sApeInp.value = this.dataset.segundoApellido || '';
-            cargoInp.value = this.dataset.cargo || '';
             emailInp.value = this.dataset.email || '';
             passInp.value = '';
             passStar.style.display = 'none';
@@ -741,7 +730,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (pts.length >= 4) { sNombreInp.value = pts[1]; pApeInp.value = pts[2]; sApeInp.value = pts.slice(3).join(' '); }
         }
 
-        cargoInp.value = <?= json_encode((string) ($row['cargo'] ?? '')) ?>;
         emailInp.value = <?= json_encode((string) ($row['email'] ?? '')) ?>;
         passInp.value = '';
         passStar.style.display = 'none';

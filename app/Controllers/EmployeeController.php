@@ -29,15 +29,14 @@ final class EmployeeController extends Controller
                 $nombre = trim((string) ($_POST['nombre'] ?? ''));
             }
 
-            $cargo = trim((string) ($_POST['cargo'] ?? '')) ?: null;
+            $rol = (string) ($_POST['rol'] ?? 'cajero');
+            if ($rol !== 'admin' && $rol !== 'cajero') {
+                $rol = 'cajero';
+            }
+            $cargo = ($rol === 'admin') ? 'Administrador' : 'Cajero';
             $salario = null;
             $email = trim((string) ($_POST['email'] ?? ''));
             $password = (string) ($_POST['password'] ?? '');
-            $rol = (string) ($_POST['rol'] ?? 'cajero');
-
-            if (!in_array($rol, ['admin', 'cajero'], true)) {
-                $rol = 'cajero';
-            }
 
             if ($a === 'create') {
                 if ($primerNombre === '' || $primerApellido === '') {
